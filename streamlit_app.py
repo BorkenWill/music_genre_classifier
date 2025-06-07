@@ -1,14 +1,14 @@
 import streamlit as st
 import librosa
 import numpy as np
-import pickle
+import joblib
 import os
 
 from extract_features import extract_features
 
 # Load trained model
-with open("model/knn_model.pkl", "rb") as f:
-    model = pickle.load(f)
+from sklearn.pipeline import Pipeline  # ✅ Required for loading a Pipeline
+model = joblib.load("model/knn_model.pkl")
 
 st.title("🎵 Music Genre Classifier")
 

@@ -2,3 +2,4 @@ __pycache__/
 model/
 audio/
 temp.wav
+!model/knn_model.pkl

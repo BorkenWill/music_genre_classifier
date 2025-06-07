@@ -5,7 +5,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import pickle
 
 # Load files and extract features
-genres = ['rock', 'classical', 'pop']
+genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'rock']
 data = []
 
 for genre in genres:

@@ -1,34 +1,38 @@
 import streamlit as st
-import librosa
 import numpy as np
+import librosa
 import joblib
-import os
+from sklearn.pipeline import Pipeline  # Ensure Pipeline is imported for model loading
 
-from extract_features import extract_features
-
-# Load trained model
-from sklearn.pipeline import Pipeline  # ✅ Required for loading a Pipeline
+# Load the trained model
 model = joblib.load("model/knn_model.pkl")
 
-st.title("🎵 Music Genre Classifier")
+# Feature extraction function
+def extract_features(file):
+    y, sr = librosa.load(file, duration=30)
+    
+    # Extract spectral features
+    zcr = np.mean(librosa.feature.zero_crossing_rate(y).T, axis=0)
+    centroid = np.mean(librosa.feature.spectral_centroid(y=y, sr=sr).T, axis=0)
+    mfcc = np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13).T, axis=0)
 
-uploaded_file = st.file_uploader("Upload an audio file (.wav)", type=["wav", "mp3"])
+    features = np.hstack([zcr, centroid, mfcc])
+    return features
+
+# Streamlit UI
+st.title("🎵 Music Genre Classification")
+
+st.write("Upload a 30-second audio file to predict its genre:")
+
+uploaded_file = st.file_uploader("Choose a .wav file", type="wav")
 
 if uploaded_file is not None:
-    st.audio(uploaded_file, format="audio/wav")
-    
-    # Save temporarily
-    with open("temp.wav", "wb") as f:
-        f.write(uploaded_file.getbuffer())
-    
-    # Extract features
-    features = extract_features("temp.wav")
-    features_array = np.array([list(features.values())])
-    
-    # Predict
-    prediction = model.predict(features_array)[0]
-    st.success(f"🎧 Predicted Genre: **{prediction.capitalize()}**")
+    st.audio(uploaded_file, format='audio/wav')
 
-    # Optional: Visualize features
-    st.subheader("Extracted Features")
-    st.write({k: round(v, 2) for k, v in features.items()})
+    try:
+        with st.spinner("Extracting features and predicting..."):
+            features = extract_features(uploaded_file)
+            prediction = model.predict([features])[0]
+            st.success(f"🎧 Predicted Genre: **{prediction}**")
+    except Exception as e:
+        st.error(f"⚠️ Error processing file: {e}")

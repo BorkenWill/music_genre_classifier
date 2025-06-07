@@ -5,7 +5,9 @@ import joblib
 from sklearn.pipeline import Pipeline  # Ensure Pipeline is imported for model loading
 
 # Load the trained model
-model = joblib.load("model/knn_model.pkl")
+data = joblib.load("model/knn_model.pkl")
+model = data["model"]  # ✅ Extract actual model
+# Optional: label_encoder = data["label_encoder"] if included
 
 # Feature extraction function
 def extract_features(file):

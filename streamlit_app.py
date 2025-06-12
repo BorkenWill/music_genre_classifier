@@ -10,6 +10,9 @@ from scripts.extract_features import extract_features
 # Load model
 model = joblib.load("model/knn_model.pkl")
 
+if uploaded_file:
+    st.audio(uploaded_file, format='audio/wav')
+
 genre_moods = {
     "blues": "🎭 Emotional", "classical": "🎼 Calm and Reflective", "country": "🌄 Heartfelt and Nostalgic",
     "disco": "🪩 Upbeat and Danceable", "hiphop": "🎤 Energetic and Bold", "jazz": "🎷 Smooth and Sophisticated",
@@ -66,5 +69,3 @@ if uploaded_file:
     except Exception as e:
         st.error(f"Prediction Error: {e}")
 
-if uploaded_file:
-    st.audio(uploaded_file, format='audio/wav')

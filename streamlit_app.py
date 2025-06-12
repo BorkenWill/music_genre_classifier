@@ -65,3 +65,6 @@ if uploaded_file:
 
     except Exception as e:
         st.error(f"Prediction Error: {e}")
+
+if uploaded_file:
+    st.audio(uploaded_file, format='audio/wav')

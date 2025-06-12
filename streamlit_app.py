@@ -10,14 +10,14 @@ from scripts.extract_features import extract_features
 # Load model
 model = joblib.load("model/knn_model.pkl")
 
-if uploaded_file:
-    st.audio(uploaded_file, format='audio/wav')
-
 genre_moods = {
     "blues": "🎭 Emotional", "classical": "🎼 Calm and Reflective", "country": "🌄 Heartfelt and Nostalgic",
     "disco": "🪩 Upbeat and Danceable", "hiphop": "🎤 Energetic and Bold", "jazz": "🎷 Smooth and Sophisticated",
     "metal": "🤘 Intense and Powerful", "pop": "🎉 Fun and Catchy", "rock": "🎸 Bold and Rebellious"
 }
+
+if uploaded_file:
+    st.audio(uploaded_file, format='audio/wav')
 
 genre_songs = {
     "blues": ["The Thrill Is Gone – B.B. King", "Sweet Home Chicago – Robert Johnson"],

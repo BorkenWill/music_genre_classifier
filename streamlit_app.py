@@ -1,77 +1,42 @@
 import streamlit as st
 import joblib
 import tempfile
+import random
 from scripts.extract_features import extract_features
 
-# Load the model
+# Load model
 model = joblib.load("model/knn_model.pkl")
 
 # Genre to mood mapping
 genre_moods = {
-    "blues": "🎷 Emotional / Reflective",
-    "classical": "🎻 Calm / Elegant",
-    "country": "🤠 Nostalgic / Heartfelt",
-    "disco": "🪩 Energetic / Fun",
-    "hiphop": "🎤 Confident / Rhythmic",
-    "jazz": "🎺 Smooth / Sophisticated",
-    "metal": "🤘 Intense / Aggressive",
-    "pop": "🎧 Upbeat / Catchy",
-    "rock": "🎸 Powerful / Rebellious",
-    "reggae": "🌴 Relaxed / Groovy"
+    "blues": "🎭 Emotional",
+    "classical": "🎼 Calm and Reflective",
+    "country": "🌄 Heartfelt and Nostalgic",
+    "disco": "🪩 Upbeat and Danceable",
+    "hiphop": "🎤 Energetic and Bold",
+    "jazz": "🎷 Smooth and Sophisticated",
+    "metal": "🤘 Intense and Powerful",
+    "pop": "🎉 Fun and Catchy",
+    "rock": "🎸 Bold and Rebellious"
 }
 
-# Page config
-st.set_page_config(page_title="Music Genre Classifier", page_icon="🎵", layout="centered")
+# Genre to songs mapping (only showing a short example for one genre here)
+genre_songs = {
+    "blues": [
+        "The Thrill Is Gone – B.B. King",
+        "Me And The Devil Blues – Robert Johnson",
+        "Boogie Chillen – John Lee Hooker",
+        "Sweet Home Chicago – Robert Johnson",
+        "Pride and Joy – Stevie Ray Vaughan"
+    ],
+    # Add similar lists for other genres...
+}
 
-# Custom CSS
-st.markdown("""
-    <style>
-    .main {
-        background-color: #f8f9fa;
-    }
-    .stApp {
-        max-width: 600px;
-        margin: auto;
-        padding-top: 3rem;
-    }
-    .title {
-        font-size: 2.5rem;
-        font-weight: bold;
-        text-align: center;
-        color: #333;
-    }
-    .subtitle {
-        text-align: center;
-        font-size: 1.2rem;
-        color: #555;
-        margin-bottom: 2rem;
-    }
-    .genre-box {
-        margin-top: 2rem;
-        padding: 1.5rem;
-        background-color: #e3f2fd;
-        border-radius: 12px;
-        text-align: center;
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #1e88e5;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .mood {
-        font-size: 1rem;
-        font-weight: normal;
-        color: #555;
-        margin-top: 0.5rem;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# UI
+st.title("🎵 Music Genre Classifier")
+st.markdown("Upload a `.wav` file to predict its genre.")
 
-# Title
-st.markdown('<div class="title">🎵 Music Genre Classifier</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Upload a WAV file to predict its genre and mood</div>', unsafe_allow_html=True)
-
-# File uploader
-uploaded_file = st.file_uploader("🎧 Upload your .wav file", type="wav")
+uploaded_file = st.file_uploader("Upload .wav file", type="wav")
 
 if uploaded_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
@@ -81,13 +46,16 @@ if uploaded_file:
     try:
         features = extract_features(tmp_path).reshape(1, -1)
         prediction = model.predict(features)[0]
-        mood = genre_moods.get(prediction.lower(), "🎼 Unknown mood")
 
-        st.markdown(f'''
-            <div class="genre-box">
-                🎶 <strong>Predicted Genre:</strong> {prediction}<br>
-                <div class="mood">🧠 <strong>Mood:</strong> {mood}</div>
-            </div>
-        ''', unsafe_allow_html=True)
+        # Show prediction and mood
+        mood = genre_moods.get(prediction, "🎶 Undefined Mood")
+        st.success(f"🎶 Predicted Genre: **{prediction}**\n\n🧠 Mood: *{mood}*")
+
+        # Suggested songs
+        suggestions = random.sample(genre_songs.get(prediction, []), 3)
+        st.markdown("🎧 **Suggested Songs:**")
+        for song in suggestions:
+            st.write(f"- {song}")
+
     except Exception as e:
         st.warning(f"⚠️ Error: {e}")

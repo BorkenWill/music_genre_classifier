@@ -2,6 +2,9 @@ import streamlit as st
 import joblib
 import tempfile
 import random
+import librosa
+import librosa.display
+import matplotlib.pyplot as plt
 from scripts.extract_features import extract_features
 
 # Load model
@@ -20,7 +23,7 @@ genre_moods = {
     "rock": "🎸 Bold and Rebellious"
 }
 
-# Genre to songs mapping (only showing a short example for one genre here)
+# Genre to songs mapping
 genre_songs = {
     "blues": [
         "The Thrill Is Gone – B.B. King",
@@ -87,9 +90,19 @@ genre_songs = {
     ]
 }
 
+# Function to display waveform
+def plot_waveform(file_path):
+    y, sr = librosa.load(file_path, sr=22050)
+    fig, ax = plt.subplots(figsize=(10, 3))
+    librosa.display.waveshow(y, sr=sr, ax=ax)
+    ax.set_title("📈 Waveform")
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Amplitude")
+    st.pyplot(fig)
+
 # UI
 st.title("🎵 Music Genre Classifier")
-st.markdown("Upload a `.wav` file to predict its genre.")
+st.markdown("Upload a `.wav` file to predict its genre and view its waveform.")
 
 uploaded_file = st.file_uploader("Upload .wav file", type="wav")
 
@@ -99,6 +112,11 @@ if uploaded_file:
         tmp_path = tmp.name
 
     try:
+        # Show waveform
+        st.subheader("📈 Audio Waveform")
+        plot_waveform(tmp_path)
+
+        # Extract features and predict
         features = extract_features(tmp_path).reshape(1, -1)
         prediction = model.predict(features)[0]
 
@@ -107,10 +125,10 @@ if uploaded_file:
         st.success(f"🎶 Predicted Genre: **{prediction}**\n\n🧠 Mood: *{mood}*")
 
         # Suggested songs
+        st.subheader("🎧 Suggested Songs")
         suggestions = random.sample(genre_songs.get(prediction, []), 3)
-        st.markdown("🎧 **Suggested Songs:**")
         for song in suggestions:
-            st.write(f"- {song}")
+            st.markdown(f"- {song}")
 
     except Exception as e:
         st.warning(f"⚠️ Error: {e}")

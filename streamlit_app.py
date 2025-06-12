@@ -1,81 +1,116 @@
 import streamlit as st
-import numpy as np
-import librosa
-import librosa.display
-import matplotlib.pyplot as plt
-import tensorflow as tf
-import os
+import joblib
 import tempfile
+import random
+from scripts.extract_features import extract_features
 
-# Load the trained CNN model
-model = tf.keras.models.load_model('cnn_genre_model.h5')
+# Load model
+model = joblib.load("model/knn_model.pkl")
 
-# Genre list
-genres = ['blues', 'classical', 'country', 'disco', 'hiphop',
-          'jazz', 'metal', 'pop', 'rock']
-
-# Suggested songs dictionary
-genre_songs = {
-    'blues': ['The Thrill Is Gone - B.B. King', 'Pride and Joy - Stevie Ray Vaughan', 'Sweet Home Chicago - Robert Johnson'],
-    'classical': ['Moonlight Sonata - Beethoven', 'Four Seasons: Spring - Vivaldi', 'Clair de Lune - Debussy'],
-    'country': ['Take Me Home, Country Roads - Lana Del Rey', 'Before He Cheats - Carrie Underwood', 'Folsom Prison Blues - Johnny Cash'],
-    'disco': ['Stayin’ Alive - Bee Gees', 'I Will Survive - Gloria Gaynor', 'Le Freak - Chic'],
-    'hiphop': ['Lose Yourself - Eminem', 'The Message - Grandmaster Flash', 'God\'s Plan - Drake'],
-    'jazz': ['So What - Miles Davis', 'Take the A Train - Duke Ellington', 'Fly Me to the Moon - Frank Sinatra'],
-    'metal': ['Master of Puppets - Metallica', 'Iron Man - Black Sabbath', 'Chop Suey! - System of a Down'],
-    'pop': ['Blinding Lights - The Weeknd', 'Levitating - Dua Lipa', 'Flowers - Miley Cyrus'],
-    'rock': ['Bohemian Rhapsody - Queen', 'Stairway to Heaven - Led Zeppelin', 'Hotel California - Eagles']
+# Genre to mood mapping
+genre_moods = {
+    "blues": "🎭 Emotional",
+    "classical": "🎼 Calm and Reflective",
+    "country": "🌄 Heartfelt and Nostalgic",
+    "disco": "🪩 Upbeat and Danceable",
+    "hiphop": "🎤 Energetic and Bold",
+    "jazz": "🎷 Smooth and Sophisticated",
+    "metal": "🤘 Intense and Powerful",
+    "pop": "🎉 Fun and Catchy",
+    "rock": "🎸 Bold and Rebellious"
 }
 
-# Extract mel-spectrogram
-def extract_features(file_path):
-    y, sr = librosa.load(file_path, sr=22050)
-    S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128)
-    S_DB = librosa.power_to_db(S, ref=np.max)
-    S_DB = librosa.util.fix_length(S_DB, size=660, axis=1)  # pad or trim to fixed length
-    S_DB = np.expand_dims(S_DB, axis=-1)  # add channel dimension
-    return S_DB
+# Genre to songs mapping (only showing a short example for one genre here)
+genre_songs = {
+    "blues": [
+        "The Thrill Is Gone – B.B. King",
+        "Me And The Devil Blues – Robert Johnson",
+        "Boogie Chillen – John Lee Hooker",
+        "Sweet Home Chicago – Robert Johnson",
+        "Pride and Joy – Stevie Ray Vaughan"
+    ],
+    "classical": [
+        "Canon in D – Pachelbel",
+        "Clair de Lune – Debussy",
+        "Für Elise – Beethoven",
+        "Moonlight Sonata – Beethoven",
+        "The Four Seasons – Vivaldi"
+    ],
+    "country": [
+        "Take Me Home, Country Roads – John Denver",
+        "Jolene – Dolly Parton",
+        "Friends in Low Places – Garth Brooks",
+        "Ring of Fire – Johnny Cash",
+        "Before He Cheats – Carrie Underwood"
+    ],
+    "disco": [
+        "Stayin’ Alive – Bee Gees",
+        "I Will Survive – Gloria Gaynor",
+        "Le Freak – Chic",
+        "Disco Inferno – The Trammps",
+        "Don’t Leave Me This Way – Thelma Houston"
+    ],
+    "hiphop": [
+        "Juicy – The Notorious B.I.G.",
+        "Lose Yourself – Eminem",
+        "N.Y. State of Mind – Nas",
+        "C.R.E.A.M. – Wu-Tang Clan",
+        "Alright – Kendrick Lamar"
+    ],
+    "jazz": [
+        "So What – Miles Davis",
+        "Take Five – Dave Brubeck",
+        "My Favorite Things – John Coltrane",
+        "Round Midnight – Thelonious Monk",
+        "At Last – Etta James"
+    ],
+    "metal": [
+        "Master of Puppets – Metallica",
+        "War Pigs – Black Sabbath",
+        "Painkiller – Judas Priest",
+        "Chop Suey! – System of a Down",
+        "Holy Wars… The Punishment Due – Megadeth"
+    ],
+    "pop": [
+        "Billie Jean – Michael Jackson",
+        "Rolling in the Deep – Adele",
+        "Blinding Lights – The Weeknd",
+        "Like a Prayer – Madonna",
+        "Shake It Off – Taylor Swift"
+    ],
+    "rock": [
+        "Bohemian Rhapsody – Queen",
+        "Stairway to Heaven – Led Zeppelin",
+        "Smells Like Teen Spirit – Nirvana",
+        "Sweet Child O’ Mine – Guns N’ Roses",
+        "Hotel California – Eagles"
+    ]
+}
 
-# Show spectrogram
-def show_spectrogram(file_path):
-    y, sr = librosa.load(file_path, sr=22050)
-    S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128)
-    S_dB = librosa.power_to_db(S, ref=np.max)
-
-    fig, ax = plt.subplots(figsize=(10, 4))
-    img = librosa.display.specshow(S_dB, sr=sr, x_axis='time', y_axis='mel', ax=ax)
-    ax.set_title('Mel Spectrogram')
-    fig.colorbar(img, ax=ax, format="%+2.f dB")
-    st.pyplot(fig)
-
-# Streamlit UI
-st.set_page_config(page_title="🎵 Music Genre Classifier", layout="centered")
+# UI
 st.title("🎵 Music Genre Classifier")
-st.write("Upload a `.wav` file to predict its music genre.")
+st.markdown("Upload a `.wav` file to predict its genre.")
 
-uploaded_file = st.file_uploader("Choose a WAV file", type=['wav'])
+uploaded_file = st.file_uploader("Upload .wav file", type="wav")
 
-if uploaded_file is not None:
+if uploaded_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
         tmp.write(uploaded_file.read())
-        file_path = tmp.name
+        tmp_path = tmp.name
 
-    # Show spectrogram
-    st.subheader("📊 Spectrogram")
-    show_spectrogram(file_path)
+    try:
+        features = extract_features(tmp_path).reshape(1, -1)
+        prediction = model.predict(features)[0]
 
-    # Extract features and predict
-    features = extract_features(file_path)
-    features = np.expand_dims(features, axis=0)  # batch dimension
-    prediction = model.predict(features)[0]
-    predicted_index = np.argmax(prediction)
-    predicted_genre = genres[predicted_index]
+        # Show prediction and mood
+        mood = genre_moods.get(prediction, "🎶 Undefined Mood")
+        st.success(f"🎶 Predicted Genre: **{prediction}**\n\n🧠 Mood: *{mood}*")
 
-    st.subheader("🎼 Predicted Genre:")
-    st.success(predicted_genre.capitalize())
+        # Suggested songs
+        suggestions = random.sample(genre_songs.get(prediction, []), 3)
+        st.markdown("🎧 **Suggested Songs:**")
+        for song in suggestions:
+            st.write(f"- {song}")
 
-    # Show suggestions
-    st.subheader("🎧 Suggested Songs:")
-    suggestions = genre_songs.get(predicted_genre, [])
-    for song in suggestions:
-        st.markdown(f"- {song}")
+    except Exception as e:
+        st.warning(f"⚠️ Error: {e}")

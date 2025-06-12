@@ -29,9 +29,63 @@ genre_songs = {
         "Sweet Home Chicago – Robert Johnson",
         "Pride and Joy – Stevie Ray Vaughan"
     ],
-    # Add similar lists for other genres...
+    "classical": [
+        "Canon in D – Pachelbel",
+        "Clair de Lune – Debussy",
+        "Für Elise – Beethoven",
+        "Moonlight Sonata – Beethoven",
+        "The Four Seasons – Vivaldi"
+    ],
+    "country": [
+        "Take Me Home, Country Roads – John Denver",
+        "Jolene – Dolly Parton",
+        "Friends in Low Places – Garth Brooks",
+        "Ring of Fire – Johnny Cash",
+        "Before He Cheats – Carrie Underwood"
+    ],
+    "disco": [
+        "Stayin’ Alive – Bee Gees",
+        "I Will Survive – Gloria Gaynor",
+        "Le Freak – Chic",
+        "Disco Inferno – The Trammps",
+        "Don’t Leave Me This Way – Thelma Houston"
+    ],
+    "hiphop": [
+        "Juicy – The Notorious B.I.G.",
+        "Lose Yourself – Eminem",
+        "N.Y. State of Mind – Nas",
+        "C.R.E.A.M. – Wu-Tang Clan",
+        "Alright – Kendrick Lamar"
+    ],
+    "jazz": [
+        "So What – Miles Davis",
+        "Take Five – Dave Brubeck",
+        "My Favorite Things – John Coltrane",
+        "Round Midnight – Thelonious Monk",
+        "At Last – Etta James"
+    ],
+    "metal": [
+        "Master of Puppets – Metallica",
+        "War Pigs – Black Sabbath",
+        "Painkiller – Judas Priest",
+        "Chop Suey! – System of a Down",
+        "Holy Wars… The Punishment Due – Megadeth"
+    ],
+    "pop": [
+        "Billie Jean – Michael Jackson",
+        "Rolling in the Deep – Adele",
+        "Blinding Lights – The Weeknd",
+        "Like a Prayer – Madonna",
+        "Shake It Off – Taylor Swift"
+    ],
+    "rock": [
+        "Bohemian Rhapsody – Queen",
+        "Stairway to Heaven – Led Zeppelin",
+        "Smells Like Teen Spirit – Nirvana",
+        "Sweet Child O’ Mine – Guns N’ Roses",
+        "Hotel California – Eagles"
+    ]
 }
-
 # UI
 st.title("🎵 Music Genre Classifier")
 st.markdown("Upload a `.wav` file to predict its genre.")

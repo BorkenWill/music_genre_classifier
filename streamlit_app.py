@@ -2,22 +2,15 @@ import streamlit as st
 import joblib
 import tempfile
 import random
-import base64
-import matplotlib.pyplot as plt
-import numpy as np
 import librosa
 import librosa.display
-
+import matplotlib.pyplot as plt
 from scripts.extract_features import extract_features
 
-# -------------------------------
-# Load the trained KNN model
-# -------------------------------
+# Load trained model
 model = joblib.load("model/knn_model.pkl")
 
-# -------------------------------
-# Genre to Mood Mapping
-# -------------------------------
+# Genre to mood mapping
 genre_moods = {
     "blues": "🎭 Emotional",
     "classical": "🎼 Calm and Reflective",
@@ -30,9 +23,7 @@ genre_moods = {
     "rock": "🎸 Bold and Rebellious"
 }
 
-# -------------------------------
-# Genre to Song Recommendations
-# -------------------------------
+# Genre to suggested songs
 genre_songs = {
     "blues": [
         "The Thrill Is Gone – B.B. King",
@@ -99,50 +90,51 @@ genre_songs = {
     ]
 }
 
-# -------------------------------
 # Streamlit UI
-# -------------------------------
+st.set_page_config(page_title="Music Genre Classifier", layout="wide")
 st.title("🎵 Music Genre Classifier")
-st.markdown("Upload a `.wav` file to predict its genre and get recommendations!")
+st.markdown("Upload a `.wav` file to predict its genre, see a waveform, and get music suggestions!")
 
-uploaded_file = st.file_uploader("🎼 Upload a WAV file", type="wav")
+# File uploader
+uploaded_file = st.file_uploader("📁 Upload a `.wav` file", type="wav")
 
-# -------------------------------
-# Handle Uploaded File
-# -------------------------------
 if uploaded_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
         tmp.write(uploaded_file.read())
         tmp_path = tmp.name
 
-    # Display audio player
-    st.audio(uploaded_file, format="audio/wav")
-
     try:
-        # Feature extraction and prediction
+        # Extract features and make prediction
         features = extract_features(tmp_path).reshape(1, -1)
         prediction = model.predict(features)[0]
-
-        # Show genre and mood
         mood = genre_moods.get(prediction, "🎶 Undefined Mood")
-        st.success(f"🎶 **Predicted Genre**: `{prediction}`")
-        st.info(f"🧠 **Mood**: {mood}")
-
-        # Suggested songs
-        st.markdown("🎧 **Suggested Songs:**")
         suggestions = random.sample(genre_songs.get(prediction, []), 3)
-        for song in suggestions:
-            st.write(f"- {song}")
 
-        # Display waveform
-        st.markdown("📊 **Waveform**")
+        # Load audio for waveform
         y, sr = librosa.load(tmp_path)
-        fig, ax = plt.subplots(figsize=(8, 3))
-        librosa.display.waveshow(y, sr=sr, ax=ax)
-        ax.set_title("Audio Waveform")
-        ax.set_xlabel("Time (s)")
-        ax.set_ylabel("Amplitude")
-        st.pyplot(fig)
+
+        # Create 2-column layout
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.success(f"🎶 **Predicted Genre**: `{prediction}`")
+            st.info(f"🧠 **Mood**: {mood}")
+
+            st.markdown("🎧 **Suggested Songs:**")
+            for song in suggestions:
+                st.write(f"- {song}")
+
+        with col2:
+            st.markdown("📊 **Waveform**")
+            fig, ax = plt.subplots(figsize=(6, 3))
+            librosa.display.waveshow(y, sr=sr, ax=ax)
+            ax.set_title("Audio Waveform")
+            ax.set_xlabel("Time (s)")
+            ax.set_ylabel("Amplitude")
+            st.pyplot(fig)
+
+        # Optional: Audio Player
+        st.audio(tmp_path, format='audio/wav')
 
     except Exception as e:
         st.warning(f"⚠️ Error: {e}")

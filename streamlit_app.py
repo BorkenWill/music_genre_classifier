@@ -6,10 +6,24 @@ from scripts.extract_features import extract_features
 # Load the model
 model = joblib.load("model/knn_model.pkl")
 
+# Genre to mood mapping
+genre_moods = {
+    "blues": "🎷 Emotional / Reflective",
+    "classical": "🎻 Calm / Elegant",
+    "country": "🤠 Nostalgic / Heartfelt",
+    "disco": "🪩 Energetic / Fun",
+    "hiphop": "🎤 Confident / Rhythmic",
+    "jazz": "🎺 Smooth / Sophisticated",
+    "metal": "🤘 Intense / Aggressive",
+    "pop": "🎧 Upbeat / Catchy",
+    "rock": "🎸 Powerful / Rebellious",
+    "reggae": "🌴 Relaxed / Groovy"
+}
+
 # Page config
 st.set_page_config(page_title="Music Genre Classifier", page_icon="🎵", layout="centered")
 
-# Custom CSS for styling
+# Custom CSS
 st.markdown("""
     <style>
     .main {
@@ -38,18 +52,25 @@ st.markdown("""
         background-color: #e3f2fd;
         border-radius: 12px;
         text-align: center;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: bold;
         color: #1e88e5;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+    .mood {
+        font-size: 1rem;
+        font-weight: normal;
+        color: #555;
+        margin-top: 0.5rem;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# App UI
+# Title
 st.markdown('<div class="title">🎵 Music Genre Classifier</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Upload a WAV file to predict its music genre</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Upload a WAV file to predict its genre and mood</div>', unsafe_allow_html=True)
 
+# File uploader
 uploaded_file = st.file_uploader("🎧 Upload your .wav file", type="wav")
 
 if uploaded_file:
@@ -60,7 +81,13 @@ if uploaded_file:
     try:
         features = extract_features(tmp_path).reshape(1, -1)
         prediction = model.predict(features)[0]
-        st.markdown(f'<div class="genre-box">🎶 Predicted Genre: <br><span>{prediction}</span></div>', unsafe_allow_html=True)
+        mood = genre_moods.get(prediction.lower(), "🎼 Unknown mood")
+
+        st.markdown(f'''
+            <div class="genre-box">
+                🎶 <strong>Predicted Genre:</strong> {prediction}<br>
+                <div class="mood">🧠 <strong>Mood:</strong> {mood}</div>
+            </div>
+        ''', unsafe_allow_html=True)
     except Exception as e:
         st.warning(f"⚠️ Error: {e}")
-

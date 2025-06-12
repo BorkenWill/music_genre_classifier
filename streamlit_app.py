@@ -16,9 +16,6 @@ genre_moods = {
     "metal": "🤘 Intense and Powerful", "pop": "🎉 Fun and Catchy", "rock": "🎸 Bold and Rebellious"
 }
 
-if uploaded_file:
-    st.audio(uploaded_file, format='audio/wav')
-
 genre_songs = {
     "blues": ["The Thrill Is Gone – B.B. King", "Sweet Home Chicago – Robert Johnson"],
     "classical": ["Canon in D – Pachelbel", "Clair de Lune – Debussy"],
@@ -47,6 +44,9 @@ def plot_waveform(file_path):
 # Streamlit UI
 st.title("🎵 Music Genre Classifier")
 uploaded_file = st.file_uploader("Upload a .wav file", type="wav")
+
+if uploaded_file:
+    st.audio(uploaded_file, format='audio/wav')
 
 if uploaded_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:

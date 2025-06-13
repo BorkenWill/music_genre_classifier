@@ -100,7 +100,7 @@ genre_songs = {
 
 # Streamlit UI
 st.set_page_config(page_title="Music Genre Classifier", layout="wide")
-st.title("🎵 Music Genre Classifier")
+st.title("🎵 Trasetone Music Genre Classifier")
 st.markdown("Upload a `.wav` file to predict its genre, see a waveform, and get music suggestions!")
 
 # File uploader

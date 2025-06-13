@@ -21,6 +21,7 @@ genre_moods = {
     "metal": "🤘 Intense and Powerful",
     "pop": "🎉 Fun and Catchy",
     "rock": "🎸 Bold and Rebellious"
+    "reggae": "🌴 Relaxed or Groovy"
 }
 
 # Genre to suggested songs

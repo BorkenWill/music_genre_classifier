@@ -12,16 +12,16 @@ model = joblib.load("model/knn_model.pkl")
 
 # Genre to mood mapping
 genre_moods = {
-    "blues": "🎭 Emotional",
-    "classical": "🎼 Calm and Reflective",
-    "country": "🌄 Heartfelt and Nostalgic",
-    "disco": "🪩 Upbeat and Danceable",
-    "hiphop": "🎤 Energetic and Bold",
-    "jazz": "🎷 Smooth and Sophisticated",
-    "metal": "🤘 Intense and Powerful",
-    "pop": "🎉 Fun and Catchy",
-    "rock": "🎸 Bold and Rebellious"
-    "reggae": "🌴 Relaxed or Groovy"
+    "blues": "🎷 Emotional / Reflective",
+    "classical": "🎻 Calm / Elegant",
+    "country": "🤠 Nostalgic / Heartfelt",
+    "disco": "🪩 Energetic / Fun",
+    "hiphop": "🎤 Confident / Rhythmic",
+    "jazz": "🎺 Smooth / Sophisticated",
+    "metal": "🤘 Intense / Aggressive",
+    "pop": "🎧 Upbeat / Catchy",
+    "rock": "🎸 Powerful / Rebellious",
+    "reggae": "🌴 Relaxed / Groovy"
 }
 
 # Genre to suggested songs
@@ -88,7 +88,14 @@ genre_songs = {
         "Smells Like Teen Spirit – Nirvana",
         "Sweet Child O’ Mine – Guns N’ Roses",
         "Hotel California – Eagles"
-    ]
+    ],
+    "reggae": [
+        "One Love - Bob Marley & The Wailers",
+        "Three Little Birds - Bob Marley",
+        "Electric Avenue - Eddy Grant",
+        "Night Nurse - Gregory Isaacs",
+        "Bad Boys - Inner Circle",
+    ],
 }
 
 # Streamlit UI

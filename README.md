@@ -1,3 +1,6 @@
+# Try it here!
+https://musicgenreclassifier-vgsdtdwfgus3izudfbknm5.streamlit.app/
+
 # 🎵 Music Genre Classification using Audio Features & KNN
 
 This project classifies music clips into genres (e.g., rock, classical, jazz, etc.) by extracting audio features from .wav files and using a K-Nearest Neighbors (KNN) classifier.
